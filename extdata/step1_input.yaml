@@ -1,0 +1,159 @@
+# ===============================
+# SAIGE fitNULLGLMM C++ YAML
+# Complete template including optional parameters.
+# Each key shows the corresponding R argument in comments.
+# ===============================
+
+paths:
+  # --- Genotype sources ---
+  # R: plinkFile (if provided, bed/bim/fam below can be left empty)
+  plinkFile: "/data/input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly"                 # e.g., "data/ukb_chr1"
+
+  # R: bedFile / bimFile / famFile (alternative to plinkFile)
+  bed: ""                       # e.g., "data/ukb.bed"
+  bim: ""                       # e.g., "data/ukb.bim"
+  fam: ""                       # e.g., "data/ukb.fam"
+
+  # R: phenoFile
+  pheno: "/data/input/pheno_1000samples.txt"       # tab/space-delimited with header
+
+  # Where to write outputs
+  # R: outputPrefix
+  out_prefix: "/data/output/run2"
+
+  # Variance ratio output prefix
+  # R: outputPrefix_varRatio (optional; if empty, use out_prefix)
+  out_prefix_vr: "/data/output/run2"
+
+  # Precomputed sparse GRM (optional)
+  # R: sparseGRMFile, sparseGRMSampleIDFile #/data/output/run1_GRMMAT.mtx /data/output/run1_GRMMAT.id
+  sparse_grm: "/data/output/run2_GRMMAT.mtx"
+  sparse_grm_ids: "/data/output/run2_GRMMAT.id"
+
+  # IID include list (one ID per line) (optional)
+  # R: SampleIDIncludeFile
+  include_sample: ""
+
+design:
+  # --- Phenotype & trait ---
+  # R: traitType ("binary"|"quantitative"|optionally "survival" if supported)
+  trait_type: "binary"
+
+  # R: phenoCol
+  pheno_col: "y"
+
+  # R: sampleIDColinphenoFile
+  sample_id_col: "IID"
+
+  # R: invNormalize (quantitative traits)
+  inverse_normalize: false
+
+  # R: covarColList
+  covariates: ["x1","x2"]
+
+  # R: qCovarCol (categorical subset of covariates; must be in covariates too)
+  categorical_covariates: ["x2"]
+
+  # R: isCovariateTransform
+  qr_transform: true
+
+  # R: minCovariateCount
+  min_covariate_count: -1
+
+  # R: isCovariateOffset
+  covariate_offset: false
+
+  # --- Sex-stratified filters (optional) ---
+  # R: sexCol, FemaleOnly, FemaleCode, MaleOnly, MaleCode
+  sex_col: ""                   # e.g., "Sex"; leave empty to disable filtering
+  female_only: false
+  female_code: "1"
+  male_only: false
+  male_code: "0"
+
+  # --- Survival analysis (optional) ---
+  # R: eventTimeCol, eventTimeBinSize, pcgforUhatforSurvAnalysis
+  event_time_col: ""            # e.g., "time_to_event"; empty disables survival branch
+  event_time_bin_size: null     # e.g., 30 (days). null leaves as-is.
+  pcg_for_uhat_surv: true
+
+fit:
+  # --- Optimization / solver controls ---
+  # R: tol, maxiter
+  tol: 0.02
+  maxiter: 20
+
+  # R: tolPCG, maxiterPCG
+  tol_pcg: 1.0e-5
+  maxiter_pcg: 500
+
+  # R: nThreads
+  n_threads: 4
+
+  # R: tauInit
+  tau_init: [0.0, 1.0]          # binary: first element forced to 1 internally
+
+  # R: skipModelFitting
+  skip_model_fitting: false
+
+  # Memory chunking for genotype passes
+  # R: memoryChunk (in GB)
+  memory_gb: 2.0
+
+  # --- SPA / test-time knobs (optional; for Step 2 usually) ---
+  # R: SPAcutoff
+  spa_cutoff: 2.0
+  # --- GRM construction / sparse-GRM controls ---
+  # R: minMAFforGRM, maxMissingRateforGRM
+  min_maf: 0.01
+  max_missing_rate: 0.15
+
+  # R: isDiagofKinSetAsOne
+  diag_one: true
+
+  # R: useSparseGRMtoFitNULL, usePCGwithSparseGRM
+  use_sparse_for_null: true
+  use_pcg_with_sparse: true
+
+  # R: numRandomMarkerforSparseKin, relatednessCutoff
+  n_random_markers_for_sparse_kin: 1000
+  relatedness_cutoff: 0.125
+
+  # --- Variance ratio estimation ---
+  # R: skipVarianceRatioEstimation
+  enabled: true
+
+  # R: numMarkersForVarRatio
+  num_markers_for_vr: 30
+
+  # R: LOCO, isLowMemLOCO
+  loco: false
+  low_mem_loco: false
+
+  # R: traceCVcutoff, ratioCVcutoff, nrun
+  trace_cv_cutoff: 0.0025
+  ratio_cv_cutoff: 0.001
+  nrun: 30
+
+  # R: includeNonautoMarkersforVarRatio
+  allow_nonauto: false
+
+  # R: IsOverwriteVarianceRatioFile
+  overwrite_file: true
+
+  # --- Categorical VR (optional) ---
+  # R: isCateVarianceRatio, cateVarRatioIndexVec,
+  #     cateVarRatioMinMACVecExclude, cateVarRatioMaxMACVecInclude
+  categorical: false
+  cate_index_vec: null          # e.g., [1,1,0] (same length as MAC categories)
+  cate_min_mac_excl: [10.0, 20.5]
+  cate_max_mac_incl: [20.5]
+
+  make_sparse_grm_only: true
+  use_sparse_grm_to_fit:: true
+# Notes:
+# - If both `paths.plinkFile` and `paths.bed/bim/fam` are provided, tooling should prefer plinkFile.
+# - `paths.out_prefix_vr` defaults to `paths.out_prefix` if empty.
+# - `design.sex_col` must be set if either `female_only` or `male_only` is true.
+# - For survival, set `design.event_time_col` and choose `design.pcg_for_uhat_surv`.
+# - SPA is typically used in the single-variant step; include here if Step 1 pre-checks use it.

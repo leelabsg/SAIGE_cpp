@@ -1,0 +1,14 @@
+fit:
+  trait: binary                 # or quantitative / survival
+  nthreads: 16
+  loco: false
+  use_sparse_grm_to_fit: true   # <- tell the fitter to use a sparse GRM
+  use_sparse_grm_for_vr: false  # set true only if you also want VR to use it
+
+paths:
+  bed: /data/example.bed
+  bim: /data/example.bim
+  fam: /data/example.fam
+  sparse_grm: /data/my.sparseGRM.mtx      # your prebuilt matrix
+  sparse_grm_ids: /data/my.sparseGRM.id   # matching sample IDs (order!)
+  out_prefix: /out/run_null_with_prebuilt_sparse

@@ -1,0 +1,7 @@
+{
+  "trait": "binary",
+  "n": 1000, "p": 3,
+  "theta": [1,0.579028],
+  "alpha": [-2.97225,0.753191,0.917874],
+  "loco": false, "lowmem_loco": false
+}

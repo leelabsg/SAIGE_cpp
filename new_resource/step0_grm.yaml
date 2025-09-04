@@ -1,0 +1,13 @@
+fit:
+  make_sparse_grm_only: true
+  use_sparse_grm_to_fit: true
+  relatedness_cutoff: 0.05
+  min_maf_grm: 0.01
+  max_miss_grm: 0.05
+paths:
+  bed: /data/x.bed
+  bim: /data/x.bim
+  fam: /data/x.fam
+  sparse_grm: /out/x.sparseGRM.mtx
+  sparse_grm_ids: /out/x.sparseGRM.id
+  out_prefix: /out/run
